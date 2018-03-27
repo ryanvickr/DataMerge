@@ -8,8 +8,9 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="316.0" prefWidth="507.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="datamerge.MainController">
    <children>
-      <TextField fx:id="txt_directory" layoutX="14.0" layoutY="38.0" prefHeight="25.0" prefWidth="412.0" />
-      <Button fx:id="btn_findDirectory" layoutX="438.0" layoutY="38.0" mnemonicParsing="false" onAction="#handle_btn_findDirectory" text="Browse" />
+      <TextField fx:id="txt_directory" layoutX="14.0" layoutY="38.0" prefHeight="25.0" prefWidth="363.0" />
+      <Button fx:id="btn_findDirectory" layoutX="387.0" layoutY="38.0" mnemonicParsing="false" onAction="#handle_btn_findDirectory" text="Browse" />
       <Label layoutX="14.0" layoutY="14.0" text="Select a directory to merge from:" />
+      <Button fx:id="btn_scan" layoutX="452.0" layoutY="38.0" mnemonicParsing="false" onAction="#handle_btn_scan" text="Scan" />
    </children>
 </AnchorPane>
