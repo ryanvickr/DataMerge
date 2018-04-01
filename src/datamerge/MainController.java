@@ -12,11 +12,14 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ResourceBundle;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -35,6 +38,15 @@ public class MainController implements Initializable {
     
     @FXML
     private TextField txt_directory;
+    
+    @FXML 
+    private Label lbl_status;
+    
+    @FXML
+    private ListView<String> listView_fileDisplay;
+    
+    final ObservableList data = FXCollections.observableArrayList();
+    
     
     /**
      * this function will retrieve the user selected directory and display it
@@ -86,19 +98,32 @@ public class MainController implements Initializable {
      * @param path the directory to scan files from
      */
     private void scanFiles(Path path){
-        System.out.println("Scanning...");
+        lbl_status.setText("Scanning...");
         txt_directory.disableProperty().set(true);
         btn_findDirectory.disableProperty().set(true);
         
         File directory = new File(path.toString());
-        for(File file : directory.listFiles()){
-            System.
+        File[] fileList = directory.listFiles(); //creates an array of File objects
+        
+        //display the files found in list
+        try{
+            data.removeAll(data); //clear the list
+            for(int i = 0; i < fileList.length; i++){
+                System.out.println("File[" + i + "]: " + fileList[i].getName());
+                data.add(fileList[i].getName());
+            }
+            listView_fileDisplay.getItems().addAll(data); //display files on screen
+        } catch (Exception ex){
+            lbl_status.setText("Could not scan files!");
+            System.out.println("Error scanning files: " + ex.toString());
         }
+        
+        lbl_status.setText("Completed scan. Found " + fileList.length + " files:");
     }
     
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        lbl_status.setText("Select a directory to scan.");
     }    
     
 }
