@@ -17,7 +17,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -40,13 +40,13 @@ public class ColumnSelectController implements Initializable {
     private Label lbl_status;
     
     @FXML
-    private Button btn_addCol;
-    
-    @FXML
     private TextField txt_colName;
     
     @FXML
     private TableView<String> tableView_col;
+    
+    @FXML
+    private ChoiceBox choiceBox_columns;
     
     @FXML
     private void handle_btn_addCol(ActionEvent event){
@@ -56,7 +56,31 @@ public class ColumnSelectController implements Initializable {
         }
         else{
             addColumn(txt_colName.getText());
+            txt_colName.clear();
         }
+    }
+    
+    /**
+     * this function will rearrange data in the ObservableList, as well as choiceBox according to user changes
+     */
+    @FXML
+    private void handle_tableView_col_rearrange(){
+        int numColumns = columns.size();
+        columns.clear();
+        for(int i = 0; i < numColumns; i++){
+            System.out.println(i + ": " + tableView_col.getColumns().get(i).getText());
+            columns.add(tableView_col.getColumns().get(i).getText());
+            choiceBox_columns.getItems().clear();
+            choiceBox_columns.getItems().addAll(columns);
+        }
+    }
+    
+    @FXML
+    private void handle_btn_deleteCol(ActionEvent event){
+        int selectedIndex = choiceBox_columns.getSelectionModel().getSelectedIndex();
+        columns.remove(selectedIndex);
+        choiceBox_columns.getItems().remove(selectedIndex);
+        tableView_col.getColumns().remove(selectedIndex);
     }
     
     /**
@@ -65,12 +89,13 @@ public class ColumnSelectController implements Initializable {
      * @param directory this is the directory to scan files from
      */
     public void setModel(ObservableList data, String directory){
+        columns.clear();
         filesList = data;
         scanDirectory = directory;
         lbl_status.setText("Currently merging " + data.size() + 
                 " files from location: " + scanDirectory);
         
-        scanColumns();
+        scanColumns(); //automatically scan for columns from first file
     }
     
     /**
@@ -111,7 +136,11 @@ public class ColumnSelectController implements Initializable {
      */
     private void addColumn(String colName){
         TableColumn newCol = new TableColumn(colName);
-        tableView_col.getColumns().add(newCol);
+        columns.add(colName); //add new column to ObservableList
+        
+        choiceBox_columns.getItems().clear();
+        choiceBox_columns.getItems().addAll(columns);
+        tableView_col.getColumns().add(newCol); //add column to tableview
     }
     
     /**
