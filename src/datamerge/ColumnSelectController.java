@@ -6,8 +6,12 @@ package datamerge;
  * and open the template in the editor.
  */
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -28,8 +32,8 @@ import javax.swing.JPanel;
  */
 public class ColumnSelectController implements Initializable {
 
-    ObservableList data = FXCollections.observableArrayList(); //stores list of files
-    ObservableList columns = FXCollections.observableArrayList();
+    ObservableList filesList = FXCollections.observableArrayList(); //stores list of files
+    ObservableList columns = FXCollections.observableArrayList(); //stores columns
     String scanDirectory; //stores the directory files will be merged from
     
     @FXML
@@ -51,20 +55,65 @@ public class ColumnSelectController implements Initializable {
             JOptionPane.showMessageDialog(panel, "Enter a valid column name!", "Error", JOptionPane.ERROR_MESSAGE);
         }
         else{
-            TableColumn newCol = new TableColumn(txt_colName.getText());
-            tableView_col.getColumns().add(newCol);
+            addColumn(txt_colName.getText());
         }
     }
     
     /**
      * this function pre-loads the ObservableList of files so that they can be used here.
      * @param data the ObservableList containing files to be merged
+     * @param directory this is the directory to scan files from
      */
     public void setModel(ObservableList data, String directory){
-        this.data = data;
+        filesList = data;
         scanDirectory = directory;
-        lbl_status.setText("Currently merging " + data.size() + " files from location: " + scanDirectory);
+        lbl_status.setText("Currently merging " + data.size() + 
+                " files from location: " + scanDirectory);
+        
+        scanColumns();
     }
+    
+    /**
+     * this function will automatically scan columns from the first file and add them
+     */
+    private void scanColumns(){
+        Scanner scanFile;
+        
+        //try adding first file to scanner
+        try{ 
+            scanFile = new Scanner(new File(scanDirectory + "\\" + 
+                                filesList.get(0).toString()));
+            
+            //get all columns to string
+            String firstRow = scanFile.nextLine();
+            System.out.println("first line is: " + firstRow);
+            
+            
+            //place string into a tokenizer to separate words(Def. delim. is '|')
+            StringTokenizer token = new StringTokenizer(firstRow,"|",false);
+            
+            while(token.hasMoreTokens()){
+                String nextCol = token.nextToken();
+                System.out.println(nextCol);
+                addColumn(nextCol);
+            }
+            
+        }catch(FileNotFoundException ex){ //if unable to scan file, display error message
+            final JPanel panel = new JPanel();
+            JOptionPane.showMessageDialog(panel, "Could not auto-fill columns. You must manually enter columns.", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /**
+     * this function will add a column to the table
+     * @param colName this should be the string value of the column.
+     */
+    private void addColumn(String colName){
+        TableColumn newCol = new TableColumn(colName);
+        tableView_col.getColumns().add(newCol);
+    }
+    
     /**
      * Initializes the controller class.
      */
