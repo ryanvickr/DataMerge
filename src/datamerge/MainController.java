@@ -6,6 +6,7 @@
 package datamerge;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.net.URL;
 import java.nio.file.LinkOption;
@@ -16,25 +17,41 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+
 /**
  *
  * @author Ryan Vickramasinghe
  */
 public class MainController implements Initializable {
     
+    //Stores file list
+    final ObservableList data = FXCollections.observableArrayList();
+    
+    //begin FXML declarations************************
     @FXML
     private Button btn_findDirectory;
     
     @FXML
     private Button btn_scan;
+    
+    @FXML
+    private Button btn_remove;
+    
+    @FXML
+    private Button btn_next;
     
     @FXML
     private TextField txt_directory;
@@ -44,9 +61,6 @@ public class MainController implements Initializable {
     
     @FXML
     private ListView<String> listView_fileDisplay;
-    
-    final ObservableList data = FXCollections.observableArrayList();
-    
     
     /**
      * this function will retrieve the user selected directory and display it
@@ -88,20 +102,87 @@ public class MainController implements Initializable {
             final JPanel panel = new JPanel();
             JOptionPane.showMessageDialog(panel, "Could not find directory!", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        else{ //if not valid, show error message:
+        else{ //if valid, call scan function (end enable/disable certain buttons):
+            //enable/disable UI features
+            lbl_status.setText("Scanning...");
+            txt_directory.disableProperty().set(true);
+            btn_findDirectory.disableProperty().set(true);
+            btn_remove.disableProperty().set(false);
+            btn_next.disableProperty().set(false);
+            
+            //call scan function
             scanFiles(directoryPath);
         }
     }
     
     /**
+     * this function will remove a selected file from the scan list
+     * @param event 
+     */
+    @FXML
+    private void handle_btn_remove(ActionEvent event){
+        try{
+            int selectedIndex = listView_fileDisplay.getSelectionModel().getSelectedIndex(); //gets selected index
+            data.remove(selectedIndex);
+            listView_fileDisplay.getItems().remove(selectedIndex);
+        }catch(Exception ex){
+            //show error message if no selection
+            System.out.println("Could not remove file: " + ex.toString());
+            final JPanel panel = new JPanel();
+            JOptionPane.showMessageDialog(panel, "Could not remove item!", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    /**
+     * this function will reset the program to its initial state
+     * @param event 
+     */
+    @FXML
+    private void handle_btn_reset(ActionEvent event){
+        //reset buttons/textfield/labels
+        lbl_status.setText("Select a directory to scan.");
+        txt_directory.clear();
+        txt_directory.disableProperty().set(false);
+        btn_findDirectory.disableProperty().set(false);
+        btn_remove.disableProperty().set(true);
+        btn_next.disableProperty().set(true);
+        
+        //reset the file listing
+        data.clear();
+        listView_fileDisplay.getItems().clear();
+    }
+    
+    /**
+     * this function will display a new window with the next steps
+     * @param event 
+     */
+    @FXML
+    private void handle_btn_next(ActionEvent event)throws IOException{
+        
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("ColumnSelect.fxml"));
+        Parent root = (Parent) fxmlLoader.load();
+        ColumnSelectController columnselectcontroller = (ColumnSelectController) fxmlLoader.getController();
+        columnselectcontroller.setModel(data, txt_directory.getText());
+        
+        Scene scene = new Scene(root);
+        Stage stage = new Stage();
+
+        stage.setScene(scene);
+        //stage.getIcons().add(new Image("file:src/iPAYROLL/WesternLogo.png"));
+        stage.setTitle("DataMerge - Step 2");
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();	
+    }
+    //end FXML declarations**************************
+    
+    //begin private member functions*****************
+    
+    /**
      * this function will read files from a directory
      * @param path the directory to scan files from
      */
-    private void scanFiles(Path path){
-        lbl_status.setText("Scanning...");
-        txt_directory.disableProperty().set(true);
-        btn_findDirectory.disableProperty().set(true);
-        
+    private void scanFiles(Path path){     
         File directory = new File(path.toString());
         File[] fileList = directory.listFiles(); //creates an array of File objects
         
