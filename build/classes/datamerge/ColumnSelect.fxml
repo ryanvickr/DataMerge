@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.shape.*?>
 <?import java.lang.*?>
 <?import java.util.*?>
 <?import javafx.scene.*?>
@@ -8,11 +9,15 @@
 
 <AnchorPane id="AnchorPane" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="datamerge.ColumnSelectController">
    <children>
-      <TableView fx:id="tableView_col" layoutX="14.0" layoutY="68.0" onMouseExited="#handle_tableView_col_rearrange" prefHeight="222.0" prefWidth="573.0" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="68.0" />
+      <TableView fx:id="tableView_data" layoutX="14.0" layoutY="68.0" onMouseExited="#handle_tableView_data_rearrange" prefHeight="222.0" prefWidth="573.0" AnchorPane.bottomAnchor="110.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="13.0" AnchorPane.topAnchor="68.0" />
       <Label fx:id="lbl_status" layoutX="14.0" layoutY="6.0" text="Loading..." wrapText="true" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0" />
       <Button fx:id="btn_addCol" layoutX="170.0" layoutY="297.0" mnemonicParsing="false" onAction="#handle_btn_addCol" text="Add Column" AnchorPane.bottomAnchor="78.0" AnchorPane.leftAnchor="170.0" />
       <TextField fx:id="txt_colName" layoutX="14.0" layoutY="297.0" promptText="Enter column name" AnchorPane.bottomAnchor="78.0" AnchorPane.leftAnchor="14.0" />
       <Button fx:id="btn_deleteCol" layoutX="535.0" layoutY="297.0" mnemonicParsing="false" onAction="#handle_btn_deleteCol" text="Delete" />
       <ChoiceBox fx:id="choiceBox_columns" layoutX="371.0" layoutY="297.0" prefWidth="150.0" />
+      <Line endX="275.0" layoutX="300.0" layoutY="334.0" startX="-275.0" />
+      <ProgressBar fx:id="progressBar_mergeProgress" layoutX="15.0" layoutY="347.0" prefHeight="18.0" prefWidth="520.0" progress="0.0" />
+      <Button fx:id="btn_start" layoutX="546.0" layoutY="344.0" mnemonicParsing="false" onAction="#handle_btn_start" text="Start" />
+      <Label fx:id="lbl_progress" layoutX="15.0" layoutY="370.0" text="Loading..." />
    </children>
 </AnchorPane>
